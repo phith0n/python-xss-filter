@@ -15,8 +15,9 @@ phithon <root@leavesongs.com> 编写于20150407
 From: XDSEC <www.xdsec.org> & 离别歌 <www.leavesongs.com>  
 GitHub Pages: https://github.com/phith0n/python-xss-filter  
 Usage:
-
-	parser = XssHtml()
+	
+	import pxfilter
+	parser = pxfilter.XssHtml()
 	parser.feed('<html code>')
 	parser.close()
 	html = parser.getHtml()
@@ -27,3 +28,6 @@ Usage:
 Python 2.6+ or 3.2+  
 Cannot defense xss in browser which is belowed IE7  
 浏览器版本：IE7+ 或其他浏览器，无法防御IE6及以下版本浏览器中的XSS  
+
+### Other
+**pxfilter.py** 是过滤类所在的文件，其他文件是测试网站 http://python-xss-filter.leavesongs.com 的源代码。  
