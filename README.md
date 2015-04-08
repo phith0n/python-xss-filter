@@ -4,7 +4,7 @@ Based on native Python module HTMLParser purifier of HTML, To Clear all javascri
 ## Python 富文本XSS过滤类
 @package XssHtml  
 @version 0.1  
-@link http://phith0n.github.io/python-xss-filter  
+@link https://github.com/phith0n/python-xss-filter
 @since 20150407  
 @copyright (c) Phithon All Rights Reserved  
 
@@ -13,7 +13,7 @@ You can use it in all python web framework
 Written by Phithon <root@leavesongs.com> in 2015 and placed in the public domain.  
 phithon <root@leavesongs.com> 编写于20150407  
 From: XDSEC <www.xdsec.org> & 离别歌 <www.leavesongs.com>  
-GitHub Pages: https://github.com/phith0n/python-xss-filter  
+Demo: http://python-xss-filter.leavesongs.com
 Usage:
 	
 	import pxfilter
