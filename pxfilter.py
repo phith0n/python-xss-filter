@@ -32,9 +32,6 @@ except:
 	from HTMLParser import HTMLParser
 
 class XssHtml(HTMLParser):
-	result = []
-	start = []
-	data = []
 	allow_tags = ['a', 'img', 'br', 'strong', 'b', 'code', 'pre',
 				  'p', 'div', 'em', 'span', 'h1', 'h2', 'h3', 'h4',
 				  'h5', 'h6', 'blockquote', 'ul', 'ol', 'tr', 'th', 'td',
@@ -49,6 +46,9 @@ class XssHtml(HTMLParser):
 	def __init__(self, allows = []):
 		HTMLParser.__init__(self)
 		self.allow_tags = allows if allows else self.allow_tags
+		self.result = []
+		self.start = []
+		self.data = []
 
 	def getHtml(self):
 		"""
