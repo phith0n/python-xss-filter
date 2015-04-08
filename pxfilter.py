@@ -122,7 +122,7 @@ class XssHtml(HTMLParser):
 		attrs = self.__common_attr(attrs)
 		attrs = self.__wash_attr(attrs, self.common_attrs + ["src", "width", "height"])
 		attrs = self.__get_link(attrs, "src")
-		attrs = self.__set_attr_default(attrs, "allowscriptaccess", "never")
+		attrs["allowscriptaccess"]="never";
 		return attrs
 
 	def node_table(self, attrs):
