@@ -3,7 +3,7 @@ Based on native Python module HTMLParser purifier of HTML, To Clear all javascri
 
 ## Python 富文本XSS过滤类
 @package python-xss-filter  
-@version 0.1.2   
+@version 0.2.0   
 @link https://github.com/phith0n/python-xss-filter  
 @since 20150407  
 @copyright (c) Phithon All Rights Reserved  
@@ -31,6 +31,8 @@ Cannot defense xss in browser which is belowed IE7
 
 ### BUGs
 20150408 embed默认allowscriptaccess=never，改为强制allowscriptaccess=never  
+20150408 移除dict.has_key，兼容python3.4，embed增加一些常规属性   
+20150408 修改代码，减少代码耦合性，增加重用性。定义每个标签允许的属性更加简单，只需要增加、更改XssHtml.tags_own_attrs即可。  
 
 ### Other
 **pxfilter.py** 是过滤类所在的文件，其他文件是测试网站 http://python-xss-filter.leavesongs.com 的源代码。  

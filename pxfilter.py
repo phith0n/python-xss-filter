@@ -36,12 +36,15 @@ class XssHtml(HTMLParser):
 				  'p', 'div', 'em', 'span', 'h1', 'h2', 'h3', 'h4',
 				  'h5', 'h6', 'blockquote', 'ul', 'ol', 'tr', 'th', 'td',
 				  'hr', 'li', 'u', 'embed', 's', 'table', 'thead', 'tbody',
-				  'caption', 'small', 'q']
-	allow_attrs = ['title', 'src', 'href', 'id', 'class', 'style',
-	               'width', 'height', 'alt', 'target', 'align', 'rel',
-					'border', 'cellpadding', 'cellspacing']
+				  'caption', 'small', 'q', 'sup', 'sub']
 	common_attrs = ["id", "style", "class", "name"]
-	nonend_tags = ["img", "hr", "br"]
+	nonend_tags = ["img", "hr", "br", "embed"]
+	tags_own_attrs = {
+		"img": ["src", "width", "height", "alt", "align"], 
+		"a": ["href", "target", "rel", "title"],
+		"embed": ["src", "width", "height", "type", "allowfullscreen", "loop", "play", "wmode", "menu"],
+		"table": ["border", "cellpadding", "cellspacing"],
+	}
 
 	def __init__(self, allows = []):
 		HTMLParser.__init__(self)
@@ -74,6 +77,7 @@ class XssHtml(HTMLParser):
 		for attr in attrs:
 			attdict[attr[0]] = attr[1]
 
+		attdict = self.__wash_attr(attdict, tag)
 		if hasattr(self, "node_%s" % tag):
 			attdict = getattr(self, "node_%s" % tag)(attdict)
 		else:
@@ -103,31 +107,30 @@ class XssHtml(HTMLParser):
 
 	def node_default(self, attrs):
 		attrs = self.__common_attr(attrs)
-		attrs = self.__wash_attr(attrs, self.common_attrs)
-		return attrs
-
-	def node_img(self, attrs):
-		attrs = self.__common_attr(attrs)
-		attrs = self.__wash_attr(attrs, self.common_attrs + ["src", "width", "height", "alt", "align"])
 		return attrs
 
 	def node_a(self, attrs):
 		attrs = self.__common_attr(attrs)
-		attrs = self.__wash_attr(attrs, self.common_attrs + ["href", "target", "rel"])
 		attrs = self.__get_link(attrs, "href")
 		attrs = self.__set_attr_default(attrs, "target", "_blank")
+		attrs = self.__limit_attr(attrs, {
+			"target": ["_blank", "_self"]
+		})
 		return attrs
 
 	def node_embed(self, attrs):
 		attrs = self.__common_attr(attrs)
-		attrs = self.__wash_attr(attrs, self.common_attrs + ["src", "width", "height"])
 		attrs = self.__get_link(attrs, "src")
-		attrs["allowscriptaccess"]="never";
-		return attrs
-
-	def node_table(self, attrs):
-		attrs = self.__common_attr(attrs)
-		attrs = self.__wash_attr(attrs, self.common_attrs + ["border", "cellpadding", "cellspacing"])
+		attrs = self.__limit_attr(attrs, {
+			"type": ["application/x-shockwave-flash"],
+			"wmode": ["transparent", "window", "opaque"],
+			"play": ["true", "false"],
+			"loop": ["true", "false"],
+			"menu": ["true", "false"],
+			"allowfullscreen": ["true", "false"]
+		})
+		attrs["allowscriptaccess"] = "never"
+		attrs["allownetworking"] = "none"
 		return attrs
 
 	def __true_url(self, url):
@@ -144,30 +147,39 @@ class XssHtml(HTMLParser):
 		return style
 
 	def __get_style(self, attrs):
-		if attrs.has_key("style"):
+		if "style" in attrs:
 			attrs["style"] = self.__true_style(attrs.get("style"))
 		return attrs
 
 	def __get_link(self, attrs, name):
-		if attrs.has_key(name):
+		if name in attrs:
 			attrs[name] = self.__true_url(attrs[name])
 		return attrs
 
-	def __wash_attr(self, attrs, allows):
+	def __wash_attr(self, attrs, tag):
+		if tag in self.tags_own_attrs:
+			other = self.tags_own_attrs.get(tag)
+		else:
+			other = []
 		if attrs:
 			for (key, value) in attrs.items():
-				if key not in allows:
+				if key not in self.common_attrs + other:
 					del attrs[key]
 		return attrs
 
 	def __common_attr(self, attrs):
-		attrs = self.__wash_attr(attrs, self.allow_attrs)
 		attrs = self.__get_style(attrs)
 		return attrs
 
 	def __set_attr_default(self, attrs, name, default = ''):
-		if not attrs.has_key(name):
+		if name not in attrs:
 			attrs[name] = default
+		return attrs
+
+	def __limit_attr(self, attrs, limit = {}):
+		for (key, value) in limit.items():
+			if key in attrs and attrs[key] not in value:
+				del attrs[key]
 		return attrs
 
 	def __htmlspecialchars(self, html):
@@ -179,8 +191,10 @@ class XssHtml(HTMLParser):
 
 if "__main__" == __name__:
 	parser = XssHtml()
-	parser.feed("""<p><img src=1 onerror=alert(/xss/)></p><div class="left"><a href='javascript:prompt(
-	1)'><br />hehe</a></div><p id="test" onmouseover="alert(1)">&gt;M<svg><a href="https://www.baidu.com" target="self"
-	>MM</a></p>""")
+	parser.feed("""<p><img src=1 onerror=alert(/xss/)></p><div class="left">
+		<a href='javascript:prompt(1)'><br />hehe</a></div>
+		<p id="test" onmouseover="alert(1)">&gt;M<svg>
+		<a href="https://www.baidu.com" target="self">MM</a></p>
+		<embed src='javascript:alert(/hehe/)' allowscriptaccess=always />""")
 	parser.close()
 	print(parser.getHtml())
