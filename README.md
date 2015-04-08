@@ -22,7 +22,8 @@ Usage:
 	html = parser.getHtml()
 	print html
 
-Requirements
+
+### Requirements
 Python 2.6+ or 3.2+
 Cannot defense xss in browser which is belowed IE7
 浏览器版本：IE7+ 或其他浏览器，无法防御IE6及以下版本浏览器中的XSS
