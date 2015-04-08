@@ -13,7 +13,7 @@ You can use it in all python web framework
 Written by Phithon <root@leavesongs.com> in 2015 and placed in the public domain.  
 phithon <root@leavesongs.com> 编写于20150407  
 From: XDSEC <www.xdsec.org> & 离别歌 <www.leavesongs.com>  
-Demo: http://python-xss-filter.leavesongs.com
+Demo: http://python-xss-filter.leavesongs.com  
 Usage:
 	
 	import pxfilter
