@@ -7,10 +7,6 @@ urls = (
     '.*', 'router'
 )
 
-app = web.application(urls, globals())
-web.config.debug = False
-app.run()
-
 class su:
     def other(self):
         raise web.seeother('main')
@@ -43,3 +39,8 @@ class router(su):
     def display(self, tplName):
         self.tplData['render'] = web.template.render('html', globals = self.globalsTplFuncs)
         return getattr(self.tplData['render'], tplName)(self.tplData)
+
+if __name__ == '__main__':
+    app = web.application(urls, globals())
+    web.config.debug = True
+    app.run()
