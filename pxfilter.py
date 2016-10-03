@@ -161,11 +161,13 @@ class XssHtml(HTMLParser):
             other = self.tags_own_attrs.get(tag)
         else:
             other = []
+
+        _attrs = {}
         if attrs:
             for (key, value) in attrs.items():
-                if key not in self.common_attrs + other:
-                    del attrs[key]
-        return attrs
+                if key in self.common_attrs + other:
+                    _attrs[key] = value
+        return _attrs
 
     def _common_attr(self, attrs):
         attrs = self._get_style(attrs)
