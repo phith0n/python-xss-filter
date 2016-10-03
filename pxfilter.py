@@ -58,10 +58,7 @@ class XssHtml(HTMLParser):
         Get the safe html code
         """
         for i in range(0, len(self.result)):
-            tmp = self.result[i].rstrip('\n')
-            tmp = tmp.lstrip('\n')
-            if tmp:
-                self.data.append(tmp)
+            self.data.append(self.result[i])
         return ''.join(self.data)
 
     def handle_startendtag(self, tag, attrs):
