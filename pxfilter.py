@@ -46,7 +46,12 @@ class XssHtml(HTMLParser):
         "table": ["border", "cellpadding", "cellspacing"],
     }
 
-    def __init__(self, allows = []):
+    _regex_url = re.compile(r'^(http|https|ftp)://.*', re.I | re.S)
+    _regex_style_1 = re.compile(r'(\\|&#|/\*|\*/)', re.I)
+    _regex_style_2 = re.compile(r'e.*x.*p.*r.*e.*s.*s.*i.*o.*n', re.I | re.S)
+
+
+    def __init__(self, allows=[]):
         HTMLParser.__init__(self)
         self.allow_tags = allows if allows else self.allow_tags
         self.result = []
@@ -131,16 +136,15 @@ class XssHtml(HTMLParser):
         return attrs
 
     def _true_url(self, url):
-        prog = re.compile(r"^(http|https|ftp)://.+", re.I | re.S)
-        if prog.match(url):
+        if self._regex_url.match(url):
             return url
         else:
             return "http://%s" % url
 
     def _true_style(self, style):
         if style:
-            style = re.sub(r"(\\|&#|/\*|\*/)", "_", style)
-            style = re.sub(r"e.*x.*p.*r.*e.*s.*s.*i.*o.*n", "_", style)
+            style = self._regex_style_1.sub('_', style)
+            style = self._regex_style_2.sub('_', style)
         return style
 
     def _get_style(self, attrs):
@@ -170,12 +174,12 @@ class XssHtml(HTMLParser):
         attrs = self._get_style(attrs)
         return attrs
 
-    def _set_attr_default(self, attrs, name, default = ''):
+    def _set_attr_default(self, attrs, name, default=''):
         if name not in attrs:
             attrs[name] = default
         return attrs
 
-    def _limit_attr(self, attrs, limit = {}):
+    def _limit_attr(self, attrs, limit={}):
         for (key, value) in limit.items():
             if key in attrs and attrs[key] not in value:
                 del attrs[key]
@@ -192,7 +196,7 @@ if "__main__" == __name__:
     parser = XssHtml()
     parser.feed("""<p><img src=1 onerror=alert(/xss/)></p><div class="left">
         <a href='javascript:prompt(1)'><br />hehe</a></div>
-        <p id="test" onmouseover="alert(1)">&gt;M<svg>
+        <p id="test" onmouseover="alert(1)" style="expresSion(alert(1))">&gt;M<svg>
         <a href="https://www.baidu.com" target="self">MM</a></p>
         <embed src='javascript:alert(/hehe/)' allowscriptaccess=always />""")
     parser.close()

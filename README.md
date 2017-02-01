@@ -34,6 +34,7 @@ Cannot defense xss in browser which is belowed IE7
 20150408 移除dict.has_key，兼容python3.4，embed增加一些常规属性   
 20150408 修改代码，减少代码耦合性，增加重用性。定义每个标签允许的属性更加简单，只需要增加、更改XssHtml.tags_own_attrs即可。  
 20150826 tab改4空格，所有双下划线方法改为单下划线，以便继承  
+20170201 将正则单独提取出来  
 
 ### Other
 **pxfilter.py** 是过滤类所在的文件，其他文件是测试网站 http://python-xss-filter.leavesongs.com 的源代码。  
